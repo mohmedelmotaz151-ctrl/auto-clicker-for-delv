@@ -1,0 +1,6 @@
+{
+  "name": "Android OCR Auto Clicker",
+  "description": "An Android application with a floating overlay for screen OCR and automatic clicking, accompanied by a live interactive web screen-capture testing dashboard and Android code generator.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
