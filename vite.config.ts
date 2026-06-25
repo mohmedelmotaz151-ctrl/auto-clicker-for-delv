@@ -18,7 +18,9 @@ function copyPwaAssetsPlugin() {
         if (fs.existsSync(sourceIcon)) {
           fs.copyFileSync(sourceIcon, path.join(publicDir, 'icon-512.jpg'));
           fs.copyFileSync(sourceIcon, path.join(publicDir, 'icon-192.jpg'));
-          console.log('Successfully copied generated app icon to /public for PWA!');
+          fs.copyFileSync(sourceIcon, path.join(publicDir, 'icon-512.png'));
+          fs.copyFileSync(sourceIcon, path.join(publicDir, 'icon-192.png'));
+          console.log('Successfully copied generated app icon to /public for PWA (.jpg & .png)!');
         } else {
           console.warn('Source app icon not found at: ', sourceIcon);
         }
