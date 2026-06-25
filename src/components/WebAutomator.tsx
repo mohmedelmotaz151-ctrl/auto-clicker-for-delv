@@ -23,29 +23,35 @@ interface WebAutomatorProps {
 
 export default function WebAutomator({ settings, setSettings }: WebAutomatorProps) {
   const [isCapturing, setIsCapturing] = useState(false);
-  const [isDemoMode, setIsDemoMode] = useState(false);
   const [isOcrProcessing, setIsOcrProcessing] = useState(false);
   const [logs, setLogs] = useState<OcrLog[]>([]);
   const [lastExtractedText, setLastExtractedText] = useState('---');
   const [lastExtractedNumber, setLastExtractedNumber] = useState<number | null>(null);
   const [clickRipples, setClickRipples] = useState<{ x: number; y: number; id: number }[]>([]);
   const [ocrProgress, setOcrProgress] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+      const isMobileUA = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+      const supportsDisplayMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia);
+      setIsMobile(isMobileUA || !supportsDisplayMedia);
+    };
+    checkMobile();
+  }, []);
 
   // Canvas and video references
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const ocrIntervalRef = useRef<any | null>(null);
-  const demoIntervalRef = useRef<any | null>(null);
   const renderLoopRef = useRef<number | null>(null);
 
   // State of crop drag interaction
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [dragType, setDragType] = useState<'move' | 'resize' | null>(null);
-
-  // Simulated live numbers for Demo mode
-  const [demoCounter, setDemoCounter] = useState(40);
 
   // Play trigger sound using Web Audio API Synthesizer
   const playTriggerSound = () => {
@@ -203,8 +209,7 @@ export default function WebAutomator({ settings, setSettings }: WebAutomatorProp
   const startScreenCapture = async () => {
     try {
       setLogs([]);
-      setIsDemoMode(false);
-      addLog('info', '🖥️ جاري طلب إذن التقاط الشاشة من المتصفح...');
+      addLog('info', '🖥️ جاري طلب إذن التقاط الشاشة لخدمة المعايرة وفحص الـ OCR...');
       
       const stream = await navigator.mediaDevices.getDisplayMedia({
         video: { displaySurface: "browser" },
@@ -224,7 +229,7 @@ export default function WebAutomator({ settings, setSettings }: WebAutomatorProp
       video.onloadedmetadata = () => {
         video.play();
         startCanvasRenderLoop();
-        addLog('info', `✅ تم تفعيل التقاط الشاشة بنجاح! دقة العرض: ${video.videoWidth}x${video.videoHeight} بكسل.`);
+        addLog('info', `✅ تم تفعيل التقاط شاشة المعايرة بنجاح! دقة العرض: ${video.videoWidth}x${video.videoHeight} بكسل.`);
         
         // Auto calibrate coordinates relative to video size
         setSettings(prev => ({
@@ -258,7 +263,6 @@ export default function WebAutomator({ settings, setSettings }: WebAutomatorProp
   // Stop screen sharing and OCR interval
   const stopAllAutomation = () => {
     setIsCapturing(false);
-    setIsDemoMode(false);
     setOcrProgress(null);
 
     if (streamRef.current) {
@@ -269,11 +273,6 @@ export default function WebAutomator({ settings, setSettings }: WebAutomatorProp
     if (ocrIntervalRef.current) {
       clearInterval(ocrIntervalRef.current);
       ocrIntervalRef.current = null;
-    }
-
-    if (demoIntervalRef.current) {
-      clearInterval(demoIntervalRef.current);
-      demoIntervalRef.current = null;
     }
 
     if (renderLoopRef.current) {
@@ -384,34 +383,6 @@ export default function WebAutomator({ settings, setSettings }: WebAutomatorProp
     }, settings.intervalMs);
 
     addLog('info', `⚙️ تم تشغيل محرك OCR المتكرر بمعدل فحص كل ${settings.intervalMs} مللي ثانية.`);
-  };
-
-  // Start offline interactive demo playground mode
-  const startDemoMode = () => {
-    stopAllAutomation();
-    setLogs([]);
-    setIsDemoMode(true);
-    addLog('info', '🎮 تم تفعيل "الوضع التجريبي الآمن" لمحاكاة التطبيق بدون تصوير الشاشة!');
-    addLog('info', '⚙️ سيقوم العداد الافتراضي بتغيير قيمته كل ثانية لمحاكاة تغير شاشة الهاتف.');
-
-    // Start simulated ticks
-    let currentVal = 40;
-    demoIntervalRef.current = setInterval(() => {
-      // Random walk or periodic increment of values
-      const change = Math.floor(Math.random() * 15) - 6; // random change from -6 to +8
-      currentVal = Math.max(1, currentVal + change);
-      
-      // Keep within a good testing range
-      if (currentVal > 150) currentVal = 20;
-      setDemoCounter(currentVal);
-
-      setLastExtractedText(`السرعة الحالية: ${currentVal} كم/س`);
-      setLastExtractedNumber(currentVal);
-
-      // Evaluate simulated value
-      evaluateConditionAndTrigger(currentVal, `السرعة الحالية: ${currentVal} كم/س`);
-
-    }, 3000); // Check every 3s for user friendly tracking
   };
 
   // Apply settings modifications on the fly
@@ -629,40 +600,25 @@ export default function WebAutomator({ settings, setSettings }: WebAutomatorProp
               {isCapturing && (
                 <span className="flex items-center gap-1 bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full border border-emerald-500/20 animate-pulse font-semibold">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
-                  بث مباشر نشط
-                </span>
-              )}
-              {isDemoMode && (
-                <span className="flex items-center gap-1 bg-amber-500/10 text-amber-400 text-[10px] px-2 py-0.5 rounded-full border border-amber-500/20 font-semibold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block animate-ping"></span>
-                  الوضع التجريبي
+                  بث مباشر نشط للـ OCR
                 </span>
               )}
             </div>
 
             {/* Launch Action triggers */}
             <div className="flex items-center gap-2">
-              {!isCapturing && !isDemoMode ? (
-                <>
-                  <button
-                    onClick={startScreenCapture}
-                    className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-md shadow-blue-900/30 active:scale-95"
-                  >
-                    <Play size={14} />
-                    بث ومراقبة الشاشة
-                  </button>
-                  <button
-                    onClick={startDemoMode}
-                    className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs px-4 py-2 rounded-xl transition-all border border-slate-700"
-                  >
-                    <Sparkles size={13} className="text-amber-400" />
-                    تشغيل محاكاة تجريبية
-                  </button>
-                </>
+              {!isCapturing ? (
+                <button
+                  onClick={startScreenCapture}
+                  className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-md shadow-blue-900/30 active:scale-95 animate-pulse"
+                >
+                  <Play size={14} />
+                  بدء البث ومراقبة الشاشة للمعايرة
+                </button>
               ) : (
                 <button
                   onClick={stopAllAutomation}
-                  className="flex items-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-md shadow-rose-950/30 active:scale-95 animate-pulse"
+                  className="flex items-center gap-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-md shadow-rose-950/30 active:scale-95"
                 >
                   <Square size={14} />
                   إيقاف البث والتعرف
@@ -679,29 +635,24 @@ export default function WebAutomator({ settings, setSettings }: WebAutomatorProp
               ref={canvasRef}
               onClick={handleCanvasClick}
               className={`max-w-full rounded-lg shadow-inner max-h-[480px] object-contain cursor-crosshair transition-all duration-300 ${
-                (isCapturing || isDemoMode) ? 'block' : 'hidden'
+                isCapturing ? 'block' : 'hidden'
               }`}
             />
 
             {/* Welcome Placeholder / Idle state */}
-            {!isCapturing && !isDemoMode && (
-              <div className="p-8 text-center max-w-md space-y-4">
+            {!isCapturing && (
+              <div className="p-8 text-center max-w-lg space-y-4">
                 <div className="w-16 h-16 rounded-2xl bg-blue-950 border border-blue-800 flex items-center justify-center mx-auto text-blue-400 shadow-lg shadow-blue-950/40">
                   <Crosshair className="w-8 h-8 animate-spin" />
                 </div>
-                <div className="space-y-1.5">
-                  <h5 className="font-bold text-slate-200 text-base">بث الشاشة وتدقيق النقرات المبرمجة</h5>
+                <div className="space-y-2">
+                  <h5 className="font-bold text-slate-200 text-base">معايرة إحداثيات الضغط والـ OCR لبرنامج الهاتف الحقيقي</h5>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    اضغط على <strong className="text-blue-400">بث ومراقبة الشاشة</strong> لاختيار نافذة (مثل صفحة ويب بها أرقام متغيرة) ليقوم محرك OCR للتعرف على النصوص بمراقبتها والضغط عند تحقق شرطك فوراً!
+                    اضغط على زر <strong className="text-blue-400">بدء البث ومراقبة الشاشة للمعايرة</strong> لاختيار نافذة (مثل صفحة ويب بها الأرقام المتغيرة) لتجربة منطق عمل القارئ التلقائي والتحقق من صحة الشرط وتأكيد موضع الضغط.
                   </p>
-                </div>
-                <div className="pt-2">
-                  <button
-                    onClick={startDemoMode}
-                    className="text-xs text-blue-400 hover:text-blue-300 underline font-medium"
-                  >
-                    أو اضغط هنا لتشغيل محاكاة ذاتية تفاعلية وسريعة
-                  </button>
+                  <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-800 text-[11px] text-amber-400 text-right leading-relaxed mt-2">
+                    🛡️ <strong>التطبيق الحقيقي بالكامل:</strong> الإعدادات التي تختارها هنا سيتم حقنها مباشرة داخل كود تطبيق الأندرويد الحقيقي (ZIP) الذي ستنزله في الخطوة التالية. سيقوم التطبيق الحقيقي بقراءة شاشة جوالك حياً وضغط الأزرار فعلياً باستخدام خدمات الأندرويد للأجهزة الذكية (MediaProjection & AccessibilityService).
+                  </div>
                 </div>
               </div>
             )}

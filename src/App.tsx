@@ -116,52 +116,52 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans" dir="rtl">
       {/* Header Bar */}
-      <header className="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-xs">
+      <header className="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-200">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-200">
               <Crosshair size={22} className="animate-pulse" />
             </div>
             <div>
-              <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">مساعد الضغط التلقائي الذكي بالأندرويد</h1>
-              <p className="text-[10px] text-slate-400 font-medium font-mono">OCR AUTO CLICKER & AUTOMATOR ENGINE</p>
+              <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">مساعد الضغط التلقائي الحقيقي وقارئ الشاشة (OCR) بالجوال</h1>
+              <p className="text-[10px] text-blue-600 font-bold font-mono">NATIVE ANDROID REAL SCREEN MONITOR & ACCESSIBILITY CLICKER</p>
             </div>
           </div>
 
           {/* Navigation Tabs */}
-          <nav className="flex items-center bg-slate-100 p-1 rounded-xl">
+          <nav className="flex items-center bg-slate-100 p-1 rounded-xl max-w-full overflow-x-auto scrollbar-none whitespace-nowrap shrink-0 w-full sm:w-auto">
             <button
               onClick={() => setActiveTab('automator')}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all shrink-0 ${
                 activeTab === 'automator'
-                  ? 'bg-white text-blue-600 shadow-xs'
+                  ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-500 hover:text-slate-900'
               }`}
             >
               <Tv size={14} />
-              شاشة المحاكاة الفورية
+              1. معايرة مستطيل القراءة وإحداثيات الضغط
             </button>
             <button
               onClick={() => setActiveTab('exporter')}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all shrink-0 ${
                 activeTab === 'exporter'
-                  ? 'bg-white text-blue-600 shadow-xs'
+                  ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-500 hover:text-slate-900'
               }`}
             >
               <Smartphone size={14} />
-              تصدير كود الأندرويد
+              2. حزم وتنزيل الكود المصدري للهاتف
             </button>
             <button
               onClick={() => setActiveTab('guide')}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all shrink-0 ${
                 activeTab === 'guide'
-                  ? 'bg-white text-blue-600 shadow-xs'
+                  ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-slate-500 hover:text-slate-900'
               }`}
             >
               <BookOpen size={14} />
-              دليل التثبيت والتشغيل
+              3. طريقة التثبيت وتفعيل الخدمة بالهاتف
             </button>
           </nav>
         </div>
@@ -179,21 +179,21 @@ export default function App() {
           {activeTab === 'automator' && (
             <div className="space-y-6">
               {/* Feature Banner */}
-              <div className="bg-slate-900 text-slate-100 p-5 rounded-2xl flex items-center justify-between flex-wrap gap-4 border border-slate-800 shadow-lg">
-                <div className="space-y-1">
+              <div className="bg-slate-900 text-slate-100 p-6 rounded-2xl flex items-center justify-between flex-wrap gap-4 border border-slate-800 shadow-lg">
+                <div className="space-y-1.5">
                   <h2 className="text-base font-bold flex items-center gap-2 text-white">
                     <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block animate-ping"></span>
-                    محاكاة التقاط شاشة المتصفح وإجراء OCR
+                    محطة معايرة الحساس والـ OCR واختيار أهداف الضغط
                   </h2>
-                  <p className="text-xs text-slate-400 leading-relaxed max-w-2xl">
-                    قبل حزم وتنزيل التطبيق لهاتفك، يمكنك تجربة منطق العمل مباشرة في المتصفح! اختر نافذة أو علامة تبويب بها أرقام متغيرة (مثل لعبة رقمية أو ساعة توقيت) وشاهد عملية التعرف والمحاكاة الفورية للنقرات عند استيفاء شروطك.
+                  <p className="text-xs text-slate-400 leading-relaxed max-w-3xl">
+                    هنا تقوم بتحديد <strong>مستطيل الفحص (Crop Zone)</strong> و <strong>إحداثيات الضغط (Click Coordinates)</strong> والشرط الرياضي. يمكنك الضغط على زر "بدء البث" واختيار شاشة لمعايرتها بدقة. هذه القيم سيتم دمجها تلقائياً داخل تطبيق الأندرويد الحقيقي ليعمل بالخلفية على شاشة جوالك مباشرة!
                   </p>
                 </div>
                 <button
                   onClick={() => setActiveTab('guide')}
-                  className="bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl transition-all"
+                  className="bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white px-4 py-2 rounded-xl transition-all shadow-md shadow-blue-900/40"
                 >
-                  كيف يعمل هذا التطبيق؟
+                  افتح دليل إعداد الهاتف 📱
                 </button>
               </div>
 
@@ -311,7 +311,7 @@ export default function App() {
 
               {/* Code viewer (7 cols) */}
               <div className="lg:col-span-7 space-y-4">
-                <div className="bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-xl flex flex-col h-[650px]">
+                <div className="bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-xl flex flex-col h-[380px] sm:h-[500px] lg:h-[650px]">
                   
                   {/* Code Viewer Header selector */}
                   <div className="bg-slate-900 px-4 py-3 border-b border-slate-850 flex items-center justify-between flex-wrap gap-2">
