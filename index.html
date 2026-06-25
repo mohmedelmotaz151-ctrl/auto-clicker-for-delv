@@ -1,11 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="ar">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
+    <title>أوتو كليكر القارئ الذكي - Smart OCR Auto Clicker</title>
+    
+    <!-- PWA Settings -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Smart Clicker" />
+    
+    <!-- App Favicons -->
+    <link rel="icon" type="image/jpeg" href="/icon-192.jpg" />
+    <link rel="apple-touch-icon" href="/icon-192.jpg" />
   </head>
-  <body>
+  <body class="bg-slate-50">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
